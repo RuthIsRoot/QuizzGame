@@ -1,0 +1,5 @@
+ANON => 999 Puntos
+RUTH => 15 Puntos
+ANI => 4 Puntos
+JAVI => 3 Puntos
+ALEX => 3 Puntos
