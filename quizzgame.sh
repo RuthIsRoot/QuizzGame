@@ -82,7 +82,18 @@ displayMenu(){
                         ;;
 
                 3 | 3.)
-                        echo -e "FALTA HACER OPCION 3"
+                        clear
+                        echo -e "${WHITE}TOP 5 MEJORES JUGADORES${NC}"
+                        echo -e "=======================\n"
+
+                        ORDENAR=$(sort -t " " -nr -k 3 puntuacion.txt -o puntuacion.txt)
+                        $ORDENAR
+                        tail -n 5 puntuacion.txt
+
+                        echo -e "\n${WHITE}[*] Presiona cualquier tecla para volver al menú principal...${NC}"
+                        read -n 1 -s -r
+                        clear
+                        displayMenu
                         ;;
 
                 4 | 4.)
