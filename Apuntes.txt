@@ -1,3 +1,17 @@
 shuf -n N input --> Lineas random
 
-awk '/LINEA/{ print NR; exit }' archivo
+awk '/LINEA/{ print NR; exit }' archivo --> Sacamos linea a partir de string
+
+sed -n [LINEA]p archivo.txt --> Sacar string de linea exacta 
+
+
+
+Shuf en array con sed para saltos de linea
+#! /bin/bash
+
+arr=()
+
+arr=($(shuf -n 10 preguntas2.txt | sed 's/:.*//'))
+
+echo ${arr[0]}
+echo ${arr[1]}
