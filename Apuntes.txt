@@ -1,0 +1,3 @@
+shuf -n N input --> Lineas random
+
+awk '/LINEA/{ print NR; exit }' archivo
