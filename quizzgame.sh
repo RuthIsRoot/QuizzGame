@@ -36,6 +36,8 @@ displayMenu(){
                                 read NPREGUNTAS
                         done
 
+                        clear
+
                         while [ $x -lt $NPREGUNTAS  ]; do
                                 echo -e "\n${WHITE}[*] Introduce la nueva pregunta :${NC}"
                                 read PREGUNTA
@@ -53,10 +55,12 @@ displayMenu(){
                                         read RESPUESTA
                                 done
 
-                                echo -e "\n${GREEN}[*]${NC} ${WHITE}Añadiendo pregunta y respuesta...${NC}"
+                                clear
+
+                                echo -e "\n${GREEN}[*]${NC} ${WHITE}Pregunta y respuesta añadidas !\n${NC}"
                                 echo $PREGUNTA >> preguntas.txt && echo $RESPUESTA >> respuestas.txt
                                 if [ $? -ne 0 ]; then
-                                        echo -e "\n${RED}[!] Algo ha fallado añadiendo tu pregutnas y respuesta !\n Saliendo...\n"
+                                        echo -e "\n${RED}[!] Algo ha fallado añadiendo tu pregunta y respuesta ;(\n Saliendo...\n"
                                         exit 1
                                 fi
 
@@ -78,7 +82,33 @@ displayMenu(){
                         ;;
 
                 2 |2.)
-                        echo -e "FALTA HACER OPCION2"
+                        checkint='^[0-9]+$'
+                        x=0
+                        TOTALPREGUNTAS=$(wc -l < preguntas.txt)
+
+                        if [ $TOTALPREGUNTAS -eq 0 ]; then
+                                echo -e "\n${RED}[!]${NC} ${WHITE}No puedes jugar si no has introducido ninguna pregunta ';)${NC}"
+                                echo -e "\n\t${GREEN}Vamos a solucionar eso, espera un momento ;)${NC}"
+
+                                sleep 5
+                                clear
+                                displayMenu
+                        fi
+
+                        echo -e "\n${WHITE}[?] Cuantas preguntas quieres jugar ?${NC}"
+                        read NPREGUNTAS
+
+                        while ! [[ $NPREGUNTAS =~ $checkint ]]; do
+                                echo -e "\n${RED}[!]${NC} ${GREEN}${NPREGUNTAS}${NC} ${WHITE}no es un número ! Introduce un número...${NC}"
+                                echo -e "\n${WHITE}[?] Cuantas preguntas quieres jugar ?${NC}"
+                                read NPREGUNTAS
+                        done
+
+                        if [ $TOTALPREGUNTAS -lt $NPREGUNTAS ]; then
+                                echo -e "\n${RED}[!]${NC} ${WHITE}Lo sentimos, no tenemos suficiente preguntas disponibles${NC}"
+                                echo -e "${WHITE}[*] Quieres jugar ${NC}${RED}${NPREGUNTAS}${NC}${WHITE} preguntas y tenemos ${NC}${GREEN}${TOTALPREGUNTAS}${NC}${WHITE} preguntas disponibles${NC}"
+                        fi
+
                         ;;
 
                 3 | 3.)
@@ -103,7 +133,7 @@ displayMenu(){
 
                 *)
                         clear
-                        echo -e "${RED}${opc}${NC} No es una opción valida !\n"
+                        echo -e "${RED}${opc}${NC} No es una opción valida !"
                         displayMenu
                         ;;
         esac
