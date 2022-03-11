@@ -69,6 +69,41 @@ addQuestions(){
         displayMenu
 }
 
+wrongQuestionsMenu(){
+            echo -e "\n${GREEN}[*]${NC} Que quieres hacer ? \n"
+
+            echo -e "1. Introducir preguntas/respuestas\n"
+            echo -e "2. Cambiar el número de preguntas a jugar\n"
+            echo -e "3. Salir\n"
+
+
+            echo -e "${GREEN}[*]${NC} Elige una opción :"
+            read opc
+
+            case $opc in
+                1 | 1.)
+                        clear
+                        addQuestions
+                        ;;
+
+                2 | 2.)
+                        clear
+                        play
+                        ;;
+
+                3 | 3.)
+                        echo -e "\nAdiós ${GREEN}${JUGADOR}${NC} ;)\n"
+                        exit 1
+                        ;;
+
+            *)
+                        clear
+                        echo -e "\n${RED}${opc}${NC} No es una opción valida ! Introduce una opción válida..."
+                        wrongQuestionsMenu
+                        ;;
+                esac
+}
+
 play(){
         checkint='^[0-9]+$'
         x=0
@@ -94,8 +129,11 @@ play(){
         done
 
         if [ $TOTALPREGUNTAS -lt $NPREGUNTAS ]; then
+            clear
             echo -e "\n${RED}[!]${NC} ${WHITE}Lo sentimos, no tenemos suficiente preguntas disponibles${NC}"
             echo -e "${WHITE}[*] Quieres jugar ${NC}${RED}${NPREGUNTAS}${NC}${WHITE} preguntas y tenemos ${NC}${GREEN}${TOTALPREGUNTAS}${NC}${WHITE} preguntas disponibles${NC}"
+
+            wrongQuestionsMenu
         fi
 }
 
@@ -118,7 +156,7 @@ displayMenu(){
                         addQuestions
                         ;;
 
-                2 |2.)
+                2 | 2.)
                         play
                         ;;
 
