@@ -143,11 +143,11 @@ play(){
 
         clear
 
-        while [ $x -lt $NPREGUNTAS ]; do
-                aux=${PREGUNTAS[$x]}
-                test=$(awk '"/${aux}/"{ print NR; exit }' preguntas.txt)
+        awk 'match($0,v){print NR; exit}' v=${PREGUNTAS[0]} preguntas.txt
+        awk 'match($0,v){print NR; exit}' v=${PREGUNTAS[1]} preguntas.txt
+        awk 'match($0,v){print NR; exit}' v=${PREGUNTAS[2]} preguntas.txt
 
-                echo $test
+        while [ $x -lt $NPREGUNTAS ]; do
 
                 echo -e "${GREEN}[*] Pregunta ${NC}\n${WHITE}${PREGUNTAS[$x]}${NC}"
                 echo -e "\n${GREEN}[*] Respuesta${NC}"
