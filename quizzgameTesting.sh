@@ -16,7 +16,7 @@ addQuestions(){
         read NPREGUNTAS
 
         while ! [[ $NPREGUNTAS =~ $checkint ]]; do
-                echo -e "\n${RED}[!]${NC} ${GREEN}${NPREGUNTAS}${NC} ${WHITE}no es un número de veces ! Introduce un número...${NC}"
+                echo -e "\n${RED}[!]${NC} ${GREEN}${NPREGUNTAS}${NC} ${WHITE}no es un número de veces válido! Introduce un número y asegurate de que sea mayor que 0...${NC}"
                 echo -e "\n${WHITE}[?] Cuantas preguntas quieres añadir ?${NC}"
                 read NPREGUNTAS
         done
@@ -58,7 +58,7 @@ addQuestions(){
                         REST=$((NPREGUNTAS-x))
                         echo -e "${WHITE}[*] Todavia te quedan ${GREEN}${REST}${NC} ${WHITE}preguntas y respuestas para añadir${NC}"
                 else
-                        echo -e "\n${WHITE}[*] Ya has añadido tus ${GREEN}${NPREGUNTAS}${NC} ${WHITE}preguntas y respuestas !${NC}"
+                        echo -e "${WHITE}[*] Ya has añadido tus ${GREEN}${NPREGUNTAS}${NC} ${WHITE}preguntas y respuestas !${NC}"
                 fi
 
         done
@@ -123,7 +123,7 @@ play(){
         read NPREGUNTAS
 
         while ! [[ $NPREGUNTAS =~ $checkint ]]; do
-            echo -e "\n${RED}[!]${NC} ${GREEN}${NPREGUNTAS}${NC} ${WHITE}no es un número ! Introduce un número...${NC}"
+            echo -e "\n${RED}[!]${NC} ${GREEN}${NPREGUNTAS}${NC} ${WHITE}no es un número válido! Introduce un número y asegurate que sea mayor que 0...${NC}"
             echo -e "\n${WHITE}[?] Cuantas preguntas quieres jugar ?${NC}"
             read NPREGUNTAS
         done
@@ -134,7 +134,39 @@ play(){
             echo -e "${WHITE}[*] Quieres jugar ${NC}${RED}${NPREGUNTAS}${NC}${WHITE} preguntas y tenemos ${NC}${GREEN}${TOTALPREGUNTAS}${NC}${WHITE} preguntas disponibles${NC}"
 
             wrongQuestionsMenu
+
+            exit 1
         fi
+
+        PREGUNTAS=($(shuf -n ${NPREGUNTAS} preguntas.txt | sed 's/:.*//'))
+        PUNTOS=0
+
+        clear
+
+        awk 'match($0,v){print NR; exit}' v=${PREGUNTAS[0]} preguntas.txt
+        awk 'match($0,v){print NR; exit}' v=${PREGUNTAS[1]} preguntas.txt
+        awk 'match($0,v){print NR; exit}' v=${PREGUNTAS[2]} preguntas.txt
+
+        while [ $x -lt $NPREGUNTAS ]; do
+
+                echo -e "${GREEN}[*] Pregunta ${NC}\n${WHITE}${PREGUNTAS[$x]}${NC}"
+                echo -e "\n${GREEN}[*] Respuesta${NC}"
+                read RESPUESTA
+
+                 while [[ -z $RESPUESTA ]]; do
+                        clear
+                        echo -e "${RED}[!]${NC} ${WHITE}No puedes dejar la respuesta vacia!${NC}"
+                        echo -e "${WHITE}[*] Introduce la respuesta a la pregunta${NC}"
+
+                        echo -e "${GREEN}[*] Pregunta ${NC}\n${WHITE}${PREGUNTAS[$x]}${NC}"
+                        echo -e "\n${GREEN}[*] Respuesta${NC}"
+                        read RESPUESTA
+                done
+
+                x=$(( $x + 1 ))
+        done
+
+        # ACABAR PUNTO 2
 }
 
 displayMenu(){
