@@ -138,14 +138,30 @@ play(){
             exit 1
         fi
 
-        PREGUNTAS=($(shuf -n ${NPREGUNTAS} preguntas.txt | sed 's/:.*//'))
+        echo -e "${GREEN}\n\t[*] Estamos cargando tus preguntas...${NC}"
+
+        PREGUNTAS=()
+        len=${#PREGUNTAS[*]}
+
+        while [ $(( $len )) -ne $NPREGUNTAS ]
+        do
+                aux=$(shuf -n 1 preguntas.txt)
+
+                while [[ !${PREGUNTAS[*]} =~ ${aux}  ]]; do
+                        aux=$(shuf -n 1 preguntas.txt)
+                done
+
+                PREGUNTAS[${#PREGUNTAS[@]}]=$aux
+
+                len=$(( $len +1 ))
+
+        done
+
+        exit 1
+
         PUNTOS=0
 
         clear
-
-        awk 'match($0,v){print NR; exit}' v=${PREGUNTAS[0]} preguntas.txt
-        awk 'match($0,v){print NR; exit}' v=${PREGUNTAS[1]} preguntas.txt
-        awk 'match($0,v){print NR; exit}' v=${PREGUNTAS[2]} preguntas.txt
 
         while [ $x -lt $NPREGUNTAS ]; do
 
