@@ -105,6 +105,7 @@ wrongQuestionsMenu(){
 }
 
 play(){
+        JUGADOR=$(whoami)
         checkint='^[0-9]+$'
         x=0
         TOTALPREGUNTAS=$(wc -l < preguntas.txt)
@@ -138,35 +139,72 @@ play(){
             exit 1
         fi
 
-        PREGUNTAS=($(shuf -n ${NPREGUNTAS} preguntas.txt | sed 's/:.*//'))
+        echo -e "${GREEN}\n\t[*] Estamos cargando tus preguntas...${NC}"
+
+        PREGUNTAS=()
+        len=${#PREGUNTAS[*]}
+
+        while [ $(( $len )) -ne $NPREGUNTAS ]
+        do
+                aux=$(shuf -n 1 preguntas.txt)
+
+                while [[ !${PREGUNTAS[*]} =~ ${aux}  ]]; do
+                        aux=$(shuf -n 1 preguntas.txt)
+                done
+
+                PREGUNTAS[${#PREGUNTAS[@]}]=$aux
+
+                len=$(( $len +1 ))
+        done
+
         PUNTOS=0
 
         clear
 
-        awk 'match($0,v){print NR; exit}' v=${PREGUNTAS[0]} preguntas.txt
-        awk 'match($0,v){print NR; exit}' v=${PREGUNTAS[1]} preguntas.txt
-        awk 'match($0,v){print NR; exit}' v=${PREGUNTAS[2]} preguntas.txt
-
         while [ $x -lt $NPREGUNTAS ]; do
-
                 echo -e "${GREEN}[*] Pregunta ${NC}\n${WHITE}${PREGUNTAS[$x]}${NC}"
                 echo -e "\n${GREEN}[*] Respuesta${NC}"
                 read RESPUESTA
 
-                 while [[ -z $RESPUESTA ]]; do
+                while [[ -z $RESPUESTA ]]; do
                         clear
                         echo -e "${RED}[!]${NC} ${WHITE}No puedes dejar la respuesta vacia!${NC}"
-                        echo -e "${WHITE}[*] Introduce la respuesta a la pregunta${NC}"
+                        echo -e "${WHITE}[*] Introduce la respuesta a la pregunta\n${NC}"
 
                         echo -e "${GREEN}[*] Pregunta ${NC}\n${WHITE}${PREGUNTAS[$x]}${NC}"
                         echo -e "\n${GREEN}[*] Respuesta${NC}"
                         read RESPUESTA
                 done
 
+                LINEAPREGUNTA=$(awk 'match($0,v){print NR; exit}' v="${PREGUNTAS[$x]}" preguntas.txt)
+                RESPUESTACORRECTA=$(sed -n ${LINEAPREGUNTA}p respuestas.txt)
+
+                if [ "${RESPUESTA}" = "${RESPUESTACORRECTA}" ]; then
+                        PUNTOS=$(( $PUNTOS + 1 ))
+                fi
+
                 x=$(( $x + 1 ))
+
+                if [ $x -ne $NPREGUNTAS ]; then
+                        REST=$((NPREGUNTAS-x))
+                        clear
+                        echo -e "${WHITE}[*] Todavia te quedan ${GREEN}${REST}${NC} ${WHITE}preguntas por jugar !\n${NC}"
+                else
+                        clear
+                        echo -e "${WHITE}[*] Ya has contestado las ${GREEN}${NPREGUNTAS}${NC} ${WHITE}preguntas !${NC}"
+                        echo -e "\n${WHITE}[*] De las ${GREEN}${NPREGUNTAS}${NC} preguntas jugadas ${WHITE}has contestado ${GREEN}${PUNTOS}${NC}${WHITE} correctamente${NC}"
+
+                        sleep 3
+                fi
+
         done
 
-        # ACABAR PUNTO 2
+        echo "${JUGADOR} == ${PUNTOS} puntos" >> puntuacion.txt
+
+        echo -e "${BOLD}${GREEN}\n\tEspera 5 segundos para volver al menú.${NC}${NORMAL}"
+        sleep 5
+        clear
+        displayMenu
 }
 
 displayMenu(){
@@ -199,7 +237,7 @@ displayMenu(){
 
                         ORDENAR=$(sort -t " " -nr -k 3 puntuacion.txt -o puntuacion.txt)
                         $ORDENAR
-                        tail -n 5 puntuacion.txt
+                        head -n 5 puntuacion.txt
 
                         echo -e "\n${WHITE}[*] Presiona cualquier tecla para volver al menú principal...${NC}"
                         read -n 1 -s -r
