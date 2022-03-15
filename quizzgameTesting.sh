@@ -16,6 +16,7 @@ addQuestions(){
         read NPREGUNTAS
 
         while ! [[ $NPREGUNTAS =~ $checkint ]]; do
+                clear
                 echo -e "\n${RED}[!]${NC} ${GREEN}${NPREGUNTAS}${NC} ${WHITE}no es un número de veces válido! Introduce un número y asegurate de que sea mayor que 0...${NC}"
                 echo -e "\n${WHITE}[?] Cuantas preguntas quieres añadir ?${NC}"
                 read NPREGUNTAS
@@ -44,12 +45,22 @@ addQuestions(){
 
                 clear
 
-                echo -e "\n${GREEN}[*]${NC} ${WHITE}Pregunta y respuesta añadidas !\n${NC}"
-                echo $PREGUNTA >> preguntas.txt && echo $RESPUESTA >> respuestas.txt
+                PREGUNTAEXISTE=$(grep -iF "${PREGUNTA}" preguntas.txt)
 
-                if [ $? -ne 0 ]; then
-                        echo -e "\n${RED}[!] Algo ha fallado añadiendo tu pregunta y respuesta ;(\n Saliendo...\n"
-                        exit 1
+                if [ $? -eq 0 ]; then
+                        echo -e "\n${RED}[!]${NC} ${WHITE}Lo sentimos, la pregunta que has añadido ya existe en nuestras preguntas ';(\n\n\t[*] Introduce una nueva pregunta diferente...\n"
+                        echo -e "${BOLD}${GREEN}\n\tEspera 5 segundos para volver al menú.${NC}${NORMAL}"
+                        sleep 5
+                        clear
+                        displayMenu
+                else
+                        echo $PREGUNTA >> preguntas.txt && echo $RESPUESTA >> respuestas.txt
+                        if [ $? -ne 0 ]; then
+                                echo -e "\n${RED}[!] Algo ha fallado añadiendo tu pregunta y respuesta ;(\n Saliendo...\n"
+                                exit 1
+                        else
+                                echo -e "\n${GREEN}[*]${NC} ${WHITE}Pregunta y respuesta añadidas !\n${NC}"
+                        fi
                 fi
 
                 x=$(( $x + 1 ))
@@ -75,7 +86,6 @@ wrongQuestionsMenu(){
             echo -e "1. Introducir preguntas/respuestas\n"
             echo -e "2. Cambiar el número de preguntas a jugar\n"
             echo -e "3. Salir\n"
-
 
             echo -e "${GREEN}[*]${NC} Elige una opción :"
             read opc
@@ -140,29 +150,16 @@ play(){
         fi
 
         echo -e "${GREEN}\n\t[*] Estamos cargando tus preguntas...${NC}"
+		
+		sleep 1.5xº
 
-        PREGUNTAS=()
-        len=${#PREGUNTAS[*]}
+		clear
 
-        while [ $(( $len )) -ne $NPREGUNTAS ]
-        do
-                aux=$(shuf -n 1 preguntas.txt)
+		PUNTOS=0
 
-                while [[ !${PREGUNTAS[*]} =~ ${aux}  ]]; do
-                        aux=$(shuf -n 1 preguntas.txt)
-                done
-
-                PREGUNTAS[${#PREGUNTAS[@]}]=$aux
-
-                len=$(( $len +1 ))
-        done
-
-        PUNTOS=0
-
-        clear
-
-        while [ $x -lt $NPREGUNTAS ]; do
-                echo -e "${GREEN}[*] Pregunta ${NC}\n${WHITE}${PREGUNTAS[$x]}${NC}"
+		for PREGUNTA in `shuf -n ${NPREGUNTAS} preguntas.txt`;
+		do
+				echo -e "${GREEN}[*] Pregunta ${NC}\n${WHITE}${PREGUNTA}${NC}"
                 echo -e "\n${GREEN}[*] Respuesta${NC}"
                 read RESPUESTA
 
@@ -176,8 +173,10 @@ play(){
                         read RESPUESTA
                 done
 
-                LINEAPREGUNTA=$(awk 'match($0,v){print NR; exit}' v="${PREGUNTAS[$x]}" preguntas.txt)
+                LINEAPREGUNTA=$(awk 'match($0,v){print NR; exit}' v="${PREGUNTA}" preguntas.txt)
                 RESPUESTACORRECTA=$(sed -n ${LINEAPREGUNTA}p respuestas.txt)
+
+                RESPUESTA=$(grep -iF "${RESPUESTA}" respuestas.txt)
 
                 if [ "${RESPUESTA}" = "${RESPUESTACORRECTA}" ]; then
                         PUNTOS=$(( $PUNTOS + 1 ))
@@ -196,8 +195,7 @@ play(){
 
                         sleep 3
                 fi
-
-        done
+		done
 
         echo "${JUGADOR} == ${PUNTOS} puntos" >> puntuacion.txt
 
