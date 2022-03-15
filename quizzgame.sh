@@ -81,13 +81,13 @@
 	}
 
 	wrongQuestionsMenu(){
-				echo -e "\n${GREEN}[*]${NC} Que quieres hacer ? \n"
+				echo -e "\n${GREEN}[*]${NC} ${WHITE}Que quieres hacer ?${NC}\n"
 
 				echo -e "1. Introducir preguntas/respuestas\n"
 				echo -e "2. Cambiar el número de preguntas a jugar\n"
 				echo -e "3. Salir\n"
 
-				echo -e "${GREEN}[*]${NC} Elige una opción :"
+				echo -e "${GREEN}[*]${NC} ${WHITE}Elige una opción :${NC}"
 				read opc
 
 				case $opc in
@@ -168,7 +168,8 @@
 
 			PUNTOS=0
 
-			for PREGUNTA in `shuf -n ${NPREGUNTAS} preguntas.txt`;
+			IFS=$'\n'
+			for PREGUNTA in $(cat preguntas.txt | shuf -n ${NPREGUNTAS});
 			do
 					echo -e "${GREEN}[*] Pregunta ${NC}\n${WHITE}${PREGUNTA}${NC}"
 					echo -e "\n${GREEN}[*] Respuesta${NC}"
@@ -207,6 +208,7 @@
 							sleep 3
 					fi
 			done
+			unset IFS
 
 			if [ ${PUNTOS} -gt 0 ]; then
 				echo "${JUGADOR} == ${PUNTOS} puntos" >> puntuacion.txt
@@ -272,4 +274,4 @@
 
 	}
 
-displayMenu
+	displayMenu
